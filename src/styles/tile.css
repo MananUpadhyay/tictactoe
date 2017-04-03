@@ -1,0 +1,17 @@
+.game-tile {
+    width: 30%;
+    height: 150px;
+    font-size: 60px;
+    background-color: #E7F76D;
+    border: 2px solid blue;
+    display: inline-block;
+    float: left;
+    text-align: center;
+    line-height: 150px;
+    margin: 2px;
+}
+
+.game-tile p {
+    position: relative;
+    bottom: 65px;
+}

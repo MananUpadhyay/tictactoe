@@ -1,0 +1,8 @@
+.visible {
+  visibility: inherit;
+  color: blue;
+}
+
+.hidden {
+  visibility: hidden;
+}

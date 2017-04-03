@@ -8,7 +8,10 @@ const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
 });
 
 module.exports = {
-  entry: './src/index.js',
+  entry: [
+    'babel-polyfill',
+    './src/index.js'
+  ],
   output: {
     path: path.resolve('dist'),
     filename: 'index_bundle.js'
@@ -16,7 +19,8 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
-      { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ }
+      { test: /\.css$/, loader: 'style-loader', exclude: /node_modules/ },
+      { test: /\.css$/, loader: 'css-loader', exclude: /node_modules/ }
     ]
   },
   plugins: [HtmlWebpackPluginConfig]
