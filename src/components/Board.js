@@ -10,105 +10,109 @@ class Board extends React.Component {
     super(props);
     this.state = {
         gameBoard: [
-          ' ',' ',' ',
-          ' ',' ',' ',
-          ' ',' ',' '
+          [' ',' ',' '],
+          [' ',' ',' '],
+          [' ',' ',' ']
         ],
         winner: null,
-        player: 'x'
+        player: 'x',
+        moves: 0
     };
   }
 
   restartGame = () => {
     this.setState({
         gameBoard: [
-          ' ',' ',' ',
-          ' ',' ',' ',
-          ' ',' ',' '
+          [' ',' ',' '],
+          [' ',' ',' '],
+          [' ',' ',' ']
         ],
         winner: null,
-        player: 'x'
+        player: 'x',
+        moves: 0
     });
   };
 
-  updateGame = (pos, player) => {
-    console.log(this.state.winner, this.state.player, this.state.gameBoard);
+  updateGame = (posX, posY, player) => {
     if (this.state.winner !== null) {
-      //make game over component visible
+      // make game over component visible
       console.log("Winner", this.state.winner);
       return;
     }
-    if (this.state.gameBoard[pos]=== 'x' || this.state.gameBoard[pos]=== 'o'){
-      //invalid move
+    if (this.state.gameBoard[posX][posY] === 'x' || this.state.gameBoard[posX][posY] === 'o') {
+      // already exists : invalid move
       return;
     }
 
+    // ensuring deep copy
     let currentGameBoard = JSON.parse(JSON.stringify(this.state.gameBoard));
-    currentGameBoard.splice(pos, 1, this.state.player);
+    currentGameBoard[posX][posY] = this.state.player;
 
-    this.setState({gameBoard: currentGameBoard}, () => {
-      var moves = this.state.gameBoard.join('').replace(/ /g,'');
-      console.log('Moves:', moves, 'Winner:', this.state.winner);
+    let updatedMoves = this.state.moves + 1;
 
-      if (moves.length === 9) {
+    let updatedState = {
+      gameBoard: currentGameBoard,
+      moves: updatedMoves
+    };
+
+    this.setState(updatedState, () => {
+      let board = this.state.gameBoard;
+      let n = this.state.gameBoard.length;
+
+      // check Columns
+      let col = board[posX][0] + board[posX][1] + board[posX][2];
+      if (col.match(/xxx|ooo/)) {
+        this.setState({winner: this.state.player});
+        return;
+      }
+
+      // check Rows
+      let row = board[0][posY] + board[1][posY] + board[2][posY];
+      if (row.match(/xxx|ooo/)) {
+        this.setState({winner: this.state.player});
+        return;
+      }
+
+      // check diagonal
+      if (posX === posY) {
+        let diag = board[0][0] + board[1][1] + board[2][2];
+        if (diag.match(/xxx|ooo/)) {
+            this.setState({winner: this.state.player});
+            return;
+        }
+      }
+
+      //check other diagonal
+      if (posX + posY === n - 1) {
+        let otherDiag = board[0][2] + board[1][1] + board[2][0];
+        if (otherDiag.match(/xxx|ooo/)) {
+            this.setState({winner: this.state.player});
+            return;
+        }
+      }
+
+      // check draws
+      if (this.state.moves === 9) {
         this.setState({winner: 'd'});
         return;
-      } else {
-        // check Rows
-        var topRow = this.state.gameBoard[0] + this.state.gameBoard[1] + this.state.gameBoard[2];
-        if (topRow.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-
-        var middleRow = this.state.gameBoard[3] + this.state.gameBoard[4] + this.state.gameBoard[5];
-        if (middleRow.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-
-        var lastRow = this.state.gameBoard[6] + this.state.gameBoard[7] + this.state.gameBoard[8];
-        if (lastRow.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-        // check Columns
-        var firstCol = this.state.gameBoard[0] + this.state.gameBoard[3] + this.state.gameBoard[6];
-        if (firstCol.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-
-        var secondCol = this.state.gameBoard[1] + this.state.gameBoard[4] + this.state.gameBoard[7];
-        if (secondCol.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-
-        var thirdCol = this.state.gameBoard[2] + this.state.gameBoard[5] + this.state.gameBoard[8];
-        if (thirdCol.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-        // check Diagonals
-        var majorDiag = this.state.gameBoard[0] + this.state.gameBoard[4] + this.state.gameBoard[8];
-        if (majorDiag.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-
-        var minorDiag = this.state.gameBoard[2] + this.state.gameBoard[4] + this.state.gameBoard[6];
-        if (minorDiag.match(/xxx|ooo/)){
-          this.setState({winner: this.state.player});
-          return;
-        }
-
-        this.setState({player: (this.state.player === 'x') ? 'o' : 'x' });
       }
+
+      this.setState({player: (this.state.player === 'x') ? 'o' : 'x' });
     });
+
   }
 
   render() {
+    let board = this.state.gameBoard.map((row, rowIndx) => {
+        return row.map((tileVal, colIndx) => {
+          return (
+            <Tile key={rowIndx + "-" + colIndx} posX={rowIndx} posY={colIndx} value={tileVal} updateGame={this.updateGame}
+              player={this.state.player}
+            />
+          );
+        });
+    });
+
     return (
      <div className="main-container">
         <h1> Tic Tac Toe </h1>
@@ -117,15 +121,10 @@ class Board extends React.Component {
           <ResetButton reset={this.restartGame} />
         </div>
         <div className="board">
-          {this.state.gameBoard.map((val, indx) => {
-            return (
-              <Tile key={indx} pos={indx} value={val} updateGame={this.updateGame}
-                player={this.state.player}
-              />
-            );
-          })}
+          {board}
         </div>
-     </div>);
+     </div>
+    );
   }
 }
 

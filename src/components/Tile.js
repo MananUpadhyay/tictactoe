@@ -4,7 +4,7 @@ import '../styles/tile.css'
 class Tile extends React.Component {
 
   tileClick = (props) => {
-    props.updateGame(props.pos, props.player);
+    props.updateGame(props.posX, props.posY, props.player);
   }
 
   render() {
