@@ -1,5 +1,6 @@
 import React from 'react';
 import Result from './Result.js';
+import Player from './Player.js';
 import ResetButton from './ResetButton.js';
 import Tile from './Tile.js';
 import '../styles/Board.css';
@@ -117,6 +118,7 @@ class Board extends React.Component {
      <div className="main-container">
         <h1> Tic Tac Toe </h1>
         <div className="top">
+          <Player player={this.state.player} winner={this.state.winner} />
           <Result player={this.state.player} winner={this.state.winner} />
           <ResetButton reset={this.restartGame} />
         </div>
